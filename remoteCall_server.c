@@ -5,27 +5,45 @@
  */
 
 #include "remoteCall.h"
+#include "callBack.h"
+#include <unistd.h>
+#include <arpa/inet.h>
 
-int *
-callcommand_1_svc(char *command,  struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
+char g_data[1024];
 
 void *
-senddata_1_svc(char *data,  struct svc_req *rqstp)
+callcommand_1_svc(char *command,  struct svc_req *rqstp)
 {
 	static char * result;
 
 	/*
 	 * insert server code here
 	 */
+
+	printf("call %s\n", command);
+	if(fork()==0){
+
+		int res = system(command);
+
+		callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), res, g_data);
+		printf("res %d, data: %s\n", res, g_data);
+		exit(0);
+	}
+
+	return (void *) &result;
+}
+
+void *
+senddata_1_svc(char *data,  struct svc_req *rqstp)
+{
+	static char * result;
+	printf("call data %s\n", data);
+	memcpy(g_data, data, strlen(data)+1);
+	printf("%s\n", g_data);
+	/*
+	 * insert server code here
+	 */
+
 
 	return (void *) &result;
 }

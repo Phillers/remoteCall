@@ -5,24 +5,27 @@
  */
 
 #include "callBack.h"
+#include <unistd.h>
 
 void *
 sendresult_1_svc(int result,  struct svc_req *rqstp)
 {
-	static char * result;
+	static char * result1;
+	result1 = &result;
 
+	printf("result %d\n", result);
 	/*
 	 * insert server code here
 	 */
 
-	return (void *) &result;
+	return (void *) &result1;
 }
 
 void *
 returndata_1_svc(int stream, char *data,  struct svc_req *rqstp)
 {
 	static char * result;
-
+	printf("%d: %s\n", stream, data);
 	/*
 	 * insert server code here
 	 */

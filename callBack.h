@@ -20,8 +20,12 @@ struct returndata_1_argument {
 };
 typedef struct returndata_1_argument returndata_1_argument;
 
-#define callBack 0x20000001
+#define callBack 0x20000002
 #define v1 1
+
+
+void callback_1_clnt(char *host, int result, char* data);
+int main2 (int argc, char **argv);
 
 #if defined(__STDC__) || defined(__cplusplus)
 #define sendResult 1

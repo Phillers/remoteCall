@@ -8,14 +8,14 @@
 
 
 void
-callback_1(char *host)
+callback_1_clnt(char *host, int result, char* data)
 {
 	CLIENT *clnt;
 	void  *result_1;
-	int sendresult_1_result;
+	int sendresult_1_result = result;
 	void  *result_2;
-	int returndata_1_stream;
-	char *returndata_1_data;
+	int returndata_1_stream=0;
+	char *returndata_1_data = data;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, callBack, v1, "udp");
@@ -25,30 +25,17 @@ callback_1(char *host)
 	}
 #endif	/* DEBUG */
 
-	result_1 = sendresult_1(sendresult_1_result, clnt);
-	if (result_1 == (void *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
 	result_2 = returndata_1(returndata_1_stream, returndata_1_data, clnt);
 	if (result_2 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
+
+	result_1 = sendresult_1(sendresult_1_result, clnt);
+	if (result_1 == (void *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+
 #ifndef	DEBUG
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
-}
-
-
-int
-main (int argc, char *argv[])
-{
-	char *host;
-
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
-		exit (1);
-	}
-	host = argv[1];
-	callback_1 (host);
-exit (0);
 }

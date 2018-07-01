@@ -5,16 +5,16 @@
  */
 
 #include "remoteCall.h"
-
+#include "callBack.h"
 
 void
-remotecall_1(char *host)
+remotecall_1(char *host, char* command)
 {
 	CLIENT *clnt;
-	int  *result_1;
-	char *callcommand_1_command;
+	void  *result_1;
+	char *callcommand_1_command = command;
 	void  *result_2;
-	char *senddata_1_data;
+	char *senddata_1_data = "XDD";
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, remoteCall, v1, "udp");
@@ -24,14 +24,16 @@ remotecall_1(char *host)
 	}
 #endif	/* DEBUG */
 
-	result_1 = callcommand_1(callcommand_1_command, clnt);
-	if (result_1 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
 	result_2 = senddata_1(senddata_1_data, clnt);
 	if (result_2 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
+
+	result_1 = callcommand_1(callcommand_1_command, clnt);
+	if (result_1 == (void *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+
 #ifndef	DEBUG
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
@@ -43,11 +45,12 @@ main (int argc, char *argv[])
 {
 	char *host;
 
-	if (argc < 2) {
+	if (argc < 3) {
 		printf ("usage: %s server_host\n", argv[0]);
 		exit (1);
 	}
 	host = argv[1];
-	remotecall_1 (host);
+	remotecall_1 (host, argv[2]);
+	main2(argc, argv);
 exit (0);
 }

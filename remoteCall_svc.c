@@ -3,7 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include "callBack.h"
+#include "remoteCall.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <rpc/pmap_clnt.h>
@@ -17,44 +17,43 @@
 #endif
 
 static void *
-_sendresult_1 (int  *argp, struct svc_req *rqstp)
+_callcommand_1 (char * *argp, struct svc_req *rqstp)
 {
-	return (sendresult_1_svc(*argp, rqstp));
+	return (callcommand_1_svc(*argp, rqstp));
 }
 
 static void *
-_returndata_1 (returndata_1_argument *argp, struct svc_req *rqstp)
+_senddata_1 (char * *argp, struct svc_req *rqstp)
 {
-	return (returndata_1_svc(argp->stream, argp->data, rqstp));
+	return (senddata_1_svc(*argp, rqstp));
 }
 
 static void
-callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
+remotecall_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		int sendresult_1_arg;
-		returndata_1_argument returndata_1_arg;
+		char *callcommand_1_arg;
+		char *senddata_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
 	char *(*local)(char *, struct svc_req *);
-	char do_exit = 0;
+
 	switch (rqstp->rq_proc) {
 	case NULLPROC:
 		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
 		return;
 
-	case sendResult:
-		do_exit = 1;
-		_xdr_argument = (xdrproc_t) xdr_int;
+	case callCommand:
+		_xdr_argument = (xdrproc_t) xdr_wrapstring;
 		_xdr_result = (xdrproc_t) xdr_void;
-		local = (char *(*)(char *, struct svc_req *)) _sendresult_1;
+		local = (char *(*)(char *, struct svc_req *)) _callcommand_1;
 		break;
 
-	case returnData:
-		_xdr_argument = (xdrproc_t) xdr_returndata_1_argument;
+	case sendData:
+		_xdr_argument = (xdrproc_t) xdr_wrapstring;
 		_xdr_result = (xdrproc_t) xdr_void;
-		local = (char *(*)(char *, struct svc_req *)) _returndata_1;
+		local = (char *(*)(char *, struct svc_req *)) _senddata_1;
 		break;
 
 	default:
@@ -66,8 +65,8 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		svcerr_decode (transp);
 		return;
 	}
+	printf("%s\n", argument.senddata_1_arg);
 	result = (*local)((char *)&argument, rqstp);
-	int retval=*result;
 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t) _xdr_result, result)) {
 		svcerr_systemerr (transp);
 	}
@@ -75,27 +74,23 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		fprintf (stderr, "%s", "unable to free arguments");
 		exit (1);
 	}
-	if(do_exit>0) {
-		printf("%d", retval);
-		exit(retval);
-	}
 	return;
 }
 
 int
-main2 (int argc, char **argv)
+main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 
-	pmap_unset (callBack, v1);
+	pmap_unset (remoteCall, v1);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, callBack, v1, callback_1, IPPROTO_UDP)) {
-		fprintf (stderr, "%s", "unable to register (callBack, v1, udp).");
+	if (!svc_register(transp, remoteCall, v1, remotecall_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (remoteCall, v1, udp).");
 		exit(1);
 	}
 
@@ -104,8 +99,8 @@ main2 (int argc, char **argv)
 		fprintf (stderr, "%s", "cannot create tcp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, callBack, v1, callback_1, IPPROTO_TCP)) {
-		fprintf (stderr, "%s", "unable to register (callBack, v1, tcp).");
+	if (!svc_register(transp, remoteCall, v1, remotecall_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (remoteCall, v1, tcp).");
 		exit(1);
 	}
 

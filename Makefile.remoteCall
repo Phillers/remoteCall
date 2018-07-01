@@ -12,8 +12,8 @@ SOURCES_SVC.c =
 SOURCES_SVC.h = 
 SOURCES.x = remoteCall.x
 
-TARGETS_SVC.c = remoteCall_svc.c remoteCall_server.c   
-TARGETS_CLNT.c = remoteCall_clnt.c remoteCall_client.c   
+TARGETS_SVC.c = remoteCall_svc.c remoteCall_server.c   callBack_clnt.c callBack_client.c callBack_xdr.c
+TARGETS_CLNT.c = remoteCall_clnt.c remoteCall_client.c   callBack_svc.c callBack_server.c callBack_xdr.c
 TARGETS = remoteCall.h   remoteCall_clnt.c remoteCall_svc.c remoteCall_client.c remoteCall_server.c
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
@@ -42,5 +42,5 @@ $(SERVER) : $(OBJECTS_SVC)
 	$(LINK.c) -o $(SERVER) $(OBJECTS_SVC) $(LDLIBS)
 
  clean:
-	 $(RM) core $(TARGETS) $(OBJECTS_CLNT) $(OBJECTS_SVC) $(CLIENT) $(SERVER)
+	 $(RM) core $(OBJECTS_CLNT) $(OBJECTS_SVC) $(CLIENT) $(SERVER)
 
