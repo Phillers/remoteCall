@@ -3,7 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include "remoteCall.h"
+#include "callBack.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <rpc/pmap_clnt.h>
@@ -16,17 +16,24 @@
 #define SIG_PF void(*)(int)
 #endif
 
-static int *
-_remotecallproc_1 (char * *argp, struct svc_req *rqstp)
+static void *
+_sendresult_1 (int  *argp, struct svc_req *rqstp)
 {
-	return (remotecallproc_1_svc(*argp, rqstp));
+	return (sendresult_1_svc(*argp, rqstp));
+}
+
+static void *
+_returndata_1 (returndata_1_argument *argp, struct svc_req *rqstp)
+{
+	return (returndata_1_svc(argp->stream, argp->data, rqstp));
 }
 
 static void
-remotecallprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
+callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		char *remotecallproc_1_arg;
+		int sendresult_1_arg;
+		returndata_1_argument returndata_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -37,10 +44,16 @@ remotecallprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
 		return;
 
-	case remoteCallProc:
-		_xdr_argument = (xdrproc_t) xdr_wrapstring;
-		_xdr_result = (xdrproc_t) xdr_int;
-		local = (char *(*)(char *, struct svc_req *)) _remotecallproc_1;
+	case sendResult:
+		_xdr_argument = (xdrproc_t) xdr_int;
+		_xdr_result = (xdrproc_t) xdr_void;
+		local = (char *(*)(char *, struct svc_req *)) _sendresult_1;
+		break;
+
+	case returnData:
+		_xdr_argument = (xdrproc_t) xdr_returndata_1_argument;
+		_xdr_result = (xdrproc_t) xdr_void;
+		local = (char *(*)(char *, struct svc_req *)) _returndata_1;
 		break;
 
 	default:
@@ -68,15 +81,15 @@ main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 
-	pmap_unset (remoteCallProg, v1);
+	pmap_unset (callBack, v1);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, remoteCallProg, v1, remotecallprog_1, IPPROTO_UDP)) {
-		fprintf (stderr, "%s", "unable to register (remoteCallProg, v1, udp).");
+	if (!svc_register(transp, callBack, v1, callback_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (callBack, v1, udp).");
 		exit(1);
 	}
 
@@ -85,8 +98,8 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "cannot create tcp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, remoteCallProg, v1, remotecallprog_1, IPPROTO_TCP)) {
-		fprintf (stderr, "%s", "unable to register (remoteCallProg, v1, tcp).");
+	if (!svc_register(transp, callBack, v1, callback_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (callBack, v1, tcp).");
 		exit(1);
 	}
 

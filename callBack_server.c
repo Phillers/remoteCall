@@ -4,22 +4,22 @@
  * as a guideline for developing your own functions.
  */
 
-#include "remoteCall.h"
+#include "callBack.h"
 
-int *
-callcommand_1_svc(char *command,  struct svc_req *rqstp)
+void *
+sendresult_1_svc(int result,  struct svc_req *rqstp)
 {
-	static int  result;
+	static char * result;
 
 	/*
 	 * insert server code here
 	 */
 
-	return &result;
+	return (void *) &result;
 }
 
 void *
-senddata_1_svc(char *data,  struct svc_req *rqstp)
+returndata_1_svc(int stream, char *data,  struct svc_req *rqstp)
 {
 	static char * result;
 

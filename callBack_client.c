@@ -4,31 +4,32 @@
  * as a guideline for developing your own functions.
  */
 
-#include "remoteCall.h"
+#include "callBack.h"
 
 
 void
-remotecall_1(char *host)
+callback_1(char *host)
 {
 	CLIENT *clnt;
-	int  *result_1;
-	char *callcommand_1_command;
+	void  *result_1;
+	int sendresult_1_result;
 	void  *result_2;
-	char *senddata_1_data;
+	int returndata_1_stream;
+	char *returndata_1_data;
 
 #ifndef	DEBUG
-	clnt = clnt_create (host, remoteCall, v1, "udp");
+	clnt = clnt_create (host, callBack, v1, "udp");
 	if (clnt == NULL) {
 		clnt_pcreateerror (host);
 		exit (1);
 	}
 #endif	/* DEBUG */
 
-	result_1 = callcommand_1(callcommand_1_command, clnt);
-	if (result_1 == (int *) NULL) {
+	result_1 = sendresult_1(sendresult_1_result, clnt);
+	if (result_1 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_2 = senddata_1(senddata_1_data, clnt);
+	result_2 = returndata_1(returndata_1_stream, returndata_1_data, clnt);
 	if (result_2 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
@@ -48,6 +49,6 @@ main (int argc, char *argv[])
 		exit (1);
 	}
 	host = argv[1];
-	remotecall_1 (host);
+	callback_1 (host);
 exit (0);
 }
