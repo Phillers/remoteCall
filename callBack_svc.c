@@ -67,7 +67,7 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		return;
 	}
 	result = (*local)((char *)&argument, rqstp);
-	int retval=*result;
+	int retval=argument.sendresult_1_arg;
 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t) _xdr_result, result)) {
 		svcerr_systemerr (transp);
 	}
@@ -76,7 +76,7 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		exit (1);
 	}
 	if(do_exit>0) {
-		printf("%d", retval);
+		printf("\n%d\n", retval);
 		exit(retval);
 	}
 	return;

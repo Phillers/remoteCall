@@ -24,7 +24,7 @@ typedef struct returndata_1_argument returndata_1_argument;
 #define v1 1
 
 
-void callback_1_clnt(char *host, int result, char* data);
+void callback_1_clnt(char *host, int result, char* data, int stream);
 int main2 (int argc, char **argv);
 
 #if defined(__STDC__) || defined(__cplusplus)

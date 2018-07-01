@@ -33,6 +33,7 @@ returndata_1(int stream, char *data,  CLIENT *clnt)
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	arg.stream = stream;
 	arg.data = data;
+	printf("XD\n");
 	if (clnt_call (clnt, returnData, (xdrproc_t) xdr_returndata_1_argument, (caddr_t) &arg,
 		(xdrproc_t) xdr_void, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {

@@ -27,7 +27,6 @@ callcommand_1(char *command,  CLIENT *clnt)
 void *
 senddata_1(char *data,  CLIENT *clnt)
 {
-	printf("%s\n", data);
 	static char clnt_res;
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, sendData,

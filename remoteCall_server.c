@@ -8,7 +8,11 @@
 #include "callBack.h"
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/wait.h>
 
+int inpipe[2];
+int outpipe[2];
+int errpipe[2];
 char g_data[1024];
 
 void *
@@ -19,14 +23,36 @@ callcommand_1_svc(char *command,  struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-
+	int res;
 	printf("call %s\n", command);
 	if(fork()==0){
-
-		int res = system(command);
-
-		callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), res, g_data);
-		printf("res %d, data: %s\n", res, g_data);
+		pipe(outpipe);
+		int pid;
+		if((pid = fork()==0)){
+			close(outpipe[0]);
+			dup2(outpipe[1],1);
+			res = system(command);
+			char eof = EOF;
+			write(1, &eof, 1);
+		}else{
+			close(outpipe[1]);
+			char buffer[1025];
+			memset(buffer, 0, 1025);
+			int bytes;
+			while((bytes = read(outpipe[0], buffer, 1024))>0){
+				printf("%d %s\n", bytes, buffer);
+				printf("%x %x\n", buffer[0], buffer[bytes-1]);
+				callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), res, buffer, 1);
+				memset(buffer, 0, 1025);
+			}
+			exit(0);
+		}
+		int status;
+		wait(&status);
+		printf("\n%d %d %d %d %d %d %d %d\n", WIFEXITED(res), WEXITSTATUS(res), WIFSIGNALED(res),
+			   WTERMSIG(res), WCOREDUMP(res), WIFSTOPPED(res), WSTOPSIG(res), WIFCONTINUED(res));
+		callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), res, g_data, -1);
+		printf("res %x, data: %s\n", res, g_data);
 		exit(0);
 	}
 

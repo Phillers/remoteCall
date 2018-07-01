@@ -8,13 +8,13 @@
 
 
 void
-callback_1_clnt(char *host, int result, char* data)
+callback_1_clnt(char *host, int result, char* data, int stream)
 {
 	CLIENT *clnt;
 	void  *result_1;
 	int sendresult_1_result = result;
 	void  *result_2;
-	int returndata_1_stream=0;
+	int returndata_1_stream=stream;
 	char *returndata_1_data = data;
 
 #ifndef	DEBUG
@@ -29,10 +29,11 @@ callback_1_clnt(char *host, int result, char* data)
 	if (result_2 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-
-	result_1 = sendresult_1(sendresult_1_result, clnt);
-	if (result_1 == (void *) NULL) {
-		clnt_perror (clnt, "call failed");
+	if(stream<0) {
+		result_1 = sendresult_1(sendresult_1_result, clnt);
+		if (result_1 == (void *) NULL) {
+			clnt_perror(clnt, "call failed");
+		}
 	}
 
 #ifndef	DEBUG
