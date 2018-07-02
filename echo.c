@@ -2,7 +2,7 @@
 #include<unistd.h>
 
 
-int main(){
+int main(int argc, char* argv[]){
 	char buf[1024];
 	int c;
 	while((c=read(0, buf, 1024))>0){

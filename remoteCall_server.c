@@ -93,7 +93,6 @@ senddata_1_svc(char *data, int size,  struct svc_req *rqstp)
 {
 	if(size>0){
 		write(inpipe[1], data, size);
-		write(1, data, size);
 	} else {
 		close(inpipe[1]);
 	}
