@@ -23,9 +23,9 @@ _callcommand_1 (char * *argp, struct svc_req *rqstp)
 }
 
 static void *
-_senddata_1 (char * *argp, struct svc_req *rqstp)
+_senddata_1 (senddata_1_argument *argp, struct svc_req *rqstp)
 {
-	return (senddata_1_svc(*argp, rqstp));
+	return (senddata_1_svc(argp->data, argp->size, rqstp));
 }
 
 static void
@@ -33,7 +33,7 @@ remotecall_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
 		char *callcommand_1_arg;
-		char *senddata_1_arg;
+		senddata_1_argument senddata_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -51,7 +51,7 @@ remotecall_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		break;
 
 	case sendData:
-		_xdr_argument = (xdrproc_t) xdr_wrapstring;
+		_xdr_argument = (xdrproc_t) xdr_senddata_1_argument;
 		_xdr_result = (xdrproc_t) xdr_void;
 		local = (char *(*)(char *, struct svc_req *)) _senddata_1;
 		break;
@@ -65,7 +65,7 @@ remotecall_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		svcerr_decode (transp);
 		return;
 	}
-	printf("%s\n", argument.senddata_1_arg);
+
 	result = (*local)((char *)&argument, rqstp);
 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t) _xdr_result, result)) {
 		svcerr_systemerr (transp);

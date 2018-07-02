@@ -12,5 +12,7 @@ xdr_returndata_1_argument (XDR *xdrs, returndata_1_argument *objp)
 		 return FALSE;
 	 if (!xdr_string (xdrs, &objp->data, 1024))
 		 return FALSE;
+	if (!xdr_int (xdrs, &objp->size))
+		return FALSE;
 	return TRUE;
 }

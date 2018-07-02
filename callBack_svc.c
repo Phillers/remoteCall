@@ -25,7 +25,7 @@ _sendresult_1 (int  *argp, struct svc_req *rqstp)
 static void *
 _returndata_1 (returndata_1_argument *argp, struct svc_req *rqstp)
 {
-	return (returndata_1_svc(argp->stream, argp->data, rqstp));
+	return (returndata_1_svc(argp->stream, argp->data, argp->size, rqstp));
 }
 
 static void
@@ -77,6 +77,7 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 	}
 	if(do_exit>0) {
 		printf("\n%d\n", retval);
+		kill(pid, 9);
 		exit(retval);
 	}
 	return;

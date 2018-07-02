@@ -10,11 +10,11 @@ SOURCES_CLNT.c =
 SOURCES_CLNT.h = 
 SOURCES_SVC.c = 
 SOURCES_SVC.h = 
-SOURCES.x = remoteCall.x
+SOURCES.x = 
 
-TARGETS_SVC.c = remoteCall_svc.c remoteCall_server.c   callBack_clnt.c callBack_client.c callBack_xdr.c
-TARGETS_CLNT.c = remoteCall_clnt.c remoteCall_client.c   callBack_svc.c callBack_server.c callBack_xdr.c
-TARGETS = remoteCall.h   remoteCall_clnt.c remoteCall_svc.c remoteCall_client.c remoteCall_server.c
+TARGETS_SVC.c = remoteCall_svc.c remoteCall_server.c remoteCall_xdr.c   callBack_clnt.c callBack_client.c callBack_xdr.c
+TARGETS_CLNT.c = remoteCall_clnt.c remoteCall_client.c remoteCall_xdr.c  callBack_svc.c callBack_server.c callBack_xdr.c
+TARGETS = 
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)

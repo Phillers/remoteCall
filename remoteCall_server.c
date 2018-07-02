@@ -24,48 +24,80 @@ callcommand_1_svc(char *command,  struct svc_req *rqstp)
 	 * insert server code here
 	 */
 	int res;
+	pipe(inpipe);
 	printf("call %s\n", command);
 	if(fork()==0){
+		close(inpipe[1]);
 		pipe(outpipe);
+		pipe(errpipe);
 		int pid;
-		if((pid = fork()==0)){
+		if((pid = fork()>0)){
 			close(outpipe[0]);
+			close(errpipe[0]);
+			int save_out = dup(1);
+			int save_err = dup(2);
+			int save_in = dup(0);
 			dup2(outpipe[1],1);
+			dup2(errpipe[1],2);
+			dup2(inpipe[0],0);
 			res = system(command);
-			char eof = EOF;
-			write(1, &eof, 1);
-		}else{
 			close(outpipe[1]);
-			char buffer[1025];
-			memset(buffer, 0, 1025);
-			int bytes;
-			while((bytes = read(outpipe[0], buffer, 1024))>0){
-				printf("%d %s\n", bytes, buffer);
-				printf("%x %x\n", buffer[0], buffer[bytes-1]);
-				callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), res, buffer, 1);
+			dup2(save_out, 1);
+			close(errpipe[1]);
+			dup2(save_err, 2);
+			close(inpipe[1]);
+			dup2(save_in, 0);
+		}else{
+			close(inpipe[0]);
+			close(outpipe[1]);
+			close(errpipe[1]);
+			if(fork()>0) {
+				close(errpipe[0]);
+				char buffer[1025];
 				memset(buffer, 0, 1025);
+				int bytes;
+				while ((bytes = read(outpipe[0], buffer, 1024)) > 0) {
+					callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), 10, buffer, 1, bytes);
+					memset(buffer, 0, 1025);
+				}
+				close(outpipe[0]);
+				wait(NULL);
+				exit(0);
+			} else{
+				close(outpipe[0]);
+				char buffer[1025];
+				memset(buffer, 0, 1025);
+				int bytes;
+				while ((bytes = read(errpipe[0], buffer, 1024)) > 0) {
+					callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), 10, buffer, 2, bytes);
+					memset(buffer, 0, 1025);
+				}
+				close(errpipe[0]);
+				exit(0);
 			}
-			exit(0);
 		}
 		int status;
 		wait(&status);
-		printf("\n%d %d %d %d %d %d %d %d\n", WIFEXITED(res), WEXITSTATUS(res), WIFSIGNALED(res),
-			   WTERMSIG(res), WCOREDUMP(res), WIFSTOPPED(res), WSTOPSIG(res), WIFCONTINUED(res));
-		callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), res, g_data, -1);
+		if(WIFEXITED(res))status=WEXITSTATUS(res);
+		else status = res;
+		callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), status, "", -1, 0);
 		printf("res %x, data: %s\n", res, g_data);
 		exit(0);
 	}
-
+	close(inpipe[0]);
 	return (void *) &result;
 }
 
 void *
-senddata_1_svc(char *data,  struct svc_req *rqstp)
+senddata_1_svc(char *data, int size,  struct svc_req *rqstp)
 {
+	if(size>0){
+		write(inpipe[1], data, size);
+		write(1, data, size);
+	} else {
+		close(inpipe[1]);
+	}
 	static char * result;
-	printf("call data %s\n", data);
-	memcpy(g_data, data, strlen(data)+1);
-	printf("%s\n", g_data);
 	/*
 	 * insert server code here
 	 */

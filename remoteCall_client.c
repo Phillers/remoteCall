@@ -6,15 +6,15 @@
 
 #include "remoteCall.h"
 #include "callBack.h"
-
-void
-remotecall_1(char *host, char* command)
-{
+#include <unistd.h>
+int pid;
+void remotecall_1(char *host, char* command){
 	CLIENT *clnt;
 	void  *result_1;
 	char *callcommand_1_command = command;
 	void  *result_2;
-	char *senddata_1_data = "XDD";
+	char senddata_1_data[1025];
+	int senddata_1_size =0;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, remoteCall, v1, "udp");
@@ -23,25 +23,36 @@ remotecall_1(char *host, char* command)
 		exit (1);
 	}
 #endif	/* DEBUG */
-
-	result_2 = senddata_1(senddata_1_data, clnt);
-	if (result_2 == (void *) NULL) {
-		clnt_perror (clnt, "call failed");
+    pid = fork();
+	if(pid == 0) {
+		memset(senddata_1_data, 0, 1025);
+		while((senddata_1_size = read(1, senddata_1_data, 1024))>0){
+			result_2 = senddata_1(senddata_1_data, senddata_1_size, clnt);
+			if (result_2 == (void *) NULL) {
+				clnt_perror(clnt, "call failed");
+			}
+			memset(senddata_1_data, 0, 1025);
+		}
+		result_2 = senddata_1(senddata_1_data, senddata_1_size, clnt);
+		if (result_2 == (void *) NULL) {
+			clnt_perror(clnt, "call failed");
+		}
 	}
-
-	result_1 = callcommand_1(callcommand_1_command, clnt);
-	if (result_1 == (void *) NULL) {
-		clnt_perror (clnt, "call failed");
+	else {
+		result_1 = callcommand_1(callcommand_1_command, clnt);
+		if (result_1 == (void *) NULL) {
+			clnt_perror(clnt, "call failed");
+		}
 	}
 
 #ifndef	DEBUG
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
+    if(pid == 0)exit(0);
 }
 
 
-int
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
 	char *host;
 
@@ -51,6 +62,6 @@ main (int argc, char *argv[])
 	}
 	host = argv[1];
 	remotecall_1 (host, argv[2]);
-	main2(argc, argv);
-exit (0);
+	main2(pid, argv);
+	exit (0);
 }

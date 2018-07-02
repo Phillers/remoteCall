@@ -8,7 +8,7 @@
 
 
 void
-callback_1_clnt(char *host, int result, char* data, int stream)
+callback_1_clnt(char *host, int result, char* data, int stream, int size)
 {
 	CLIENT *clnt;
 	void  *result_1;
@@ -16,6 +16,7 @@ callback_1_clnt(char *host, int result, char* data, int stream)
 	void  *result_2;
 	int returndata_1_stream=stream;
 	char *returndata_1_data = data;
+	int returndata_1_size = size;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, callBack, v1, "udp");
@@ -25,10 +26,13 @@ callback_1_clnt(char *host, int result, char* data, int stream)
 	}
 #endif	/* DEBUG */
 
-	result_2 = returndata_1(returndata_1_stream, returndata_1_data, clnt);
+	result_2 = returndata_1(returndata_1_stream,
+							returndata_1_data,
+							returndata_1_size, clnt);
 	if (result_2 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
+
 	if(stream<0) {
 		result_1 = sendresult_1(sendresult_1_result, clnt);
 		if (result_1 == (void *) NULL) {

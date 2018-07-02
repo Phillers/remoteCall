@@ -17,6 +17,7 @@ extern "C" {
 struct returndata_1_argument {
 	int stream;
 	char *data;
+	int size;
 };
 typedef struct returndata_1_argument returndata_1_argument;
 
@@ -24,16 +25,16 @@ typedef struct returndata_1_argument returndata_1_argument;
 #define v1 1
 
 
-void callback_1_clnt(char *host, int result, char* data, int stream);
+void callback_1_clnt(char *host, int result, char* data, int stream, int size);
 int main2 (int argc, char **argv);
-
+extern int pid;
 #if defined(__STDC__) || defined(__cplusplus)
 #define sendResult 1
 extern  void * sendresult_1(int , CLIENT *);
 extern  void * sendresult_1_svc(int , struct svc_req *);
 #define returnData 2
-extern  void * returndata_1(int , char *, CLIENT *);
-extern  void * returndata_1_svc(int , char *, struct svc_req *);
+extern  void * returndata_1(int , char *, int, CLIENT *);
+extern  void * returndata_1_svc(int , char *, int, struct svc_req *);
 extern int callback_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */

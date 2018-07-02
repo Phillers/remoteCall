@@ -13,6 +13,11 @@
 extern "C" {
 #endif
 
+struct senddata_1_argument {
+    char *data;
+    int size;
+};
+typedef struct senddata_1_argument senddata_1_argument;
 
 #define remoteCall 0x20000001
 #define v1 1
@@ -22,8 +27,8 @@ extern "C" {
 extern  void * callcommand_1(char *, CLIENT *);
 extern  void * callcommand_1_svc(char *, struct svc_req *);
 #define sendData 2
-extern  void * senddata_1(char *, CLIENT *);
-extern  void * senddata_1_svc(char *, struct svc_req *);
+extern  void * senddata_1(char *, int, CLIENT *);
+extern  void * senddata_1_svc(char *, int, struct svc_req *);
 extern int remotecall_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -34,6 +39,16 @@ extern  void * callcommand_1_svc();
 extern  void * senddata_1();
 extern  void * senddata_1_svc();
 extern int remotecall_1_freeresult ();
+#endif /* K&R C */
+
+/* the xdr functions */
+
+#if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t xdr_senddata_1_argument (XDR *, senddata_1_argument*);
+
+#else /* K&R C */
+extern bool_t xdr_senddata_1_argument ();
+
 #endif /* K&R C */
 
 #ifdef __cplusplus

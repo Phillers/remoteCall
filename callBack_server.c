@@ -21,10 +21,10 @@ sendresult_1_svc(int result,  struct svc_req *rqstp)
 }
 
 void *
-returndata_1_svc(int stream, char *data,  struct svc_req *rqstp)
+returndata_1_svc(int stream, char *data, int size, struct svc_req *rqstp)
 {
 	static char * result;
-	write(stream, data, 1024);
+	write(stream, data, size);
 	/*
 	 * insert server code here
 	 */
