@@ -27,7 +27,10 @@ typedef struct returndata_1_argument returndata_1_argument;
 
 void callback_1_clnt(char *host, int result, char* data, int stream, int size);
 int main2 (int argc, char **argv);
-extern int pid;
+extern int global_pid;
+extern int global_res;
+extern int global_exit;
+
 #if defined(__STDC__) || defined(__cplusplus)
 #define sendResult 1
 extern  void * sendresult_1(int , CLIENT *);

@@ -13,7 +13,6 @@
 int inpipe[2];
 int outpipe[2];
 int errpipe[2];
-char g_data[1024];
 
 void *
 callcommand_1_svc(char *command,  struct svc_req *rqstp)
@@ -81,7 +80,7 @@ callcommand_1_svc(char *command,  struct svc_req *rqstp)
 		if(WIFEXITED(res))status=WEXITSTATUS(res);
 		else status = res;
 		callback_1_clnt(inet_ntoa(rqstp->rq_xprt->xp_raddr.sin_addr), status, "", -1, 0);
-		printf("res %x, data: %s\n", res, g_data);
+		printf("res %x\n", res);
 		exit(0);
 	}
 	close(inpipe[0]);
@@ -95,6 +94,7 @@ senddata_1_svc(char *data, int size,  struct svc_req *rqstp)
 		write(inpipe[1], data, size);
 	} else {
 		close(inpipe[1]);
+		wait(NULL);
 	}
 	static char * result;
 	/*

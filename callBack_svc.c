@@ -38,14 +38,13 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
 	char *(*local)(char *, struct svc_req *);
-	char do_exit = 0;
+
 	switch (rqstp->rq_proc) {
 	case NULLPROC:
 		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
 		return;
 
 	case sendResult:
-		do_exit = 1;
 		_xdr_argument = (xdrproc_t) xdr_int;
 		_xdr_result = (xdrproc_t) xdr_void;
 		local = (char *(*)(char *, struct svc_req *)) _sendresult_1;
@@ -67,7 +66,7 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		return;
 	}
 	result = (*local)((char *)&argument, rqstp);
-	int retval=argument.sendresult_1_arg;
+
 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t) _xdr_result, result)) {
 		svcerr_systemerr (transp);
 	}
@@ -75,10 +74,9 @@ callback_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		fprintf (stderr, "%s", "unable to free arguments");
 		exit (1);
 	}
-	if(do_exit>0) {
-		printf("\n%d\n", retval);
-		kill(pid, 9);
-		exit(retval);
+	if(global_exit>0) {
+		kill(global_pid, 10);
+		exit(global_res);
 	}
 	return;
 }

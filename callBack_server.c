@@ -11,8 +11,9 @@ void *
 sendresult_1_svc(int result,  struct svc_req *rqstp)
 {
 	static char * result1;
-
-	printf("\nresult %d\n", result);
+	global_res = result;
+	global_exit = 1;
+	printf("\nresult: %d\n", result);
 	/*
 	 * insert server code here
 	 */
