@@ -9,16 +9,13 @@
 #include <unistd.h>
 CLIENT *clnt;
 
-void *result_2;
-char senddata_1_data[1025];
-int senddata_1_size = 0;
 
 int global_res;
 int global_exit=0;
 int global_pid;
 
 void finish(int sig){
-    result_2 = senddata_1(senddata_1_data, senddata_1_size, clnt);
+    void * result_2 = senddata_1("", 0, clnt);
     if (result_2 == (void *) NULL) {
         clnt_perror(clnt, "call failed");
     }
@@ -28,6 +25,9 @@ void finish(int sig){
 
 void remotecall_1(char *host, char *command) {
 
+    void *result_2;
+    char senddata_1_data[1025];
+    int senddata_1_size = 0;
     void *result_1;
     char *callcommand_1_command = command;
 
